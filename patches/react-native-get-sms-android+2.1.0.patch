@@ -1,0 +1,25 @@
+diff --git a/node_modules/react-native-get-sms-android/android/build.gradle b/node_modules/react-native-get-sms-android/android/build.gradle
+--- a/node_modules/react-native-get-sms-android/android/build.gradle
++++ b/node_modules/react-native-get-sms-android/android/build.gradle
+@@ -2,7 +2,7 @@
+ buildscript {
+     repositories {
+         google()
+-        jcenter()
++        mavenCentral()
+     }
+ 
+     dependencies {
+@@ -32,11 +32,11 @@
+ 
+ repositories {
+     google()
++    mavenCentral()
+     maven {
+         // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+         url "$rootDir/../node_modules/react-native/android"
+     }
+-    jcenter()
+ }
+ 
+ dependencies {

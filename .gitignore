@@ -6,6 +6,7 @@ node_modules/
 # Expo
 .expo/
 dist/
+dist-android/
 web-build/
 expo-env.d.ts
 
@@ -31,6 +32,7 @@ yarn-error.*
 *.pem
 
 # local env files
+.env
 .env*.local
 
 # typescript
@@ -40,4 +42,18 @@ example
 
 # generated native folders
 /ios
-/android
+
+# Android contains custom usage and step-counting modules; commit its sources.
+/android/.gradle/
+/android/.kotlin/
+/android/.cxx/
+/android/build/
+/android/app/build/
+/android/app/.cxx/
+/android/local.properties
+*.keystore
+!android/app/debug.keystore
+credentials.json
+.env.*
+!.env.example
+!.env.production.example
