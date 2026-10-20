@@ -122,7 +122,7 @@ export default function ApplicationAssistantScreen() {
       return;
     }
     if (!capabilities?.processing_enabled) {
-      setError('The application assistant is not enabled on the server yet.');
+      setError('The backend reports the application assistant is disabled. Restart the backend after enabling it and configuring GEMINI_API_KEY, then check assistant status again.');
       return;
     }
     const userMessage: ApplicationMessage = { role: 'user', content };
@@ -317,7 +317,12 @@ export default function ApplicationAssistantScreen() {
             <View style={styles.messageCopy}>
               <Text style={[styles.sectionTitle, { color: colors.text }]}>Assistant setup is not complete</Text>
               <Text style={[styles.caption, { color: colors.muted }]}>{capabilities.message}</Text>
-              <Text style={[styles.caption, { color: colors.muted }]}>Personal-data processing stays disabled until the backend owner verifies billing and data-processing terms, then enables it in the backend secret settings.</Text>
+              <Text style={[styles.caption, { color: colors.muted }]}>The backend reports that processing is unavailable. Confirm its application processing setting and server-side GEMINI_API_KEY, restart the backend so it reloads its environment, then check again. Enable personal-data processing only after reviewing Gemini billing and data-processing terms.</Text>
+              <Pressable accessibilityRole="button" disabled={loadingCapabilities} onPress={() => void loadCapabilities()}
+                style={[styles.secondaryAction, { backgroundColor: colors.surfaceAlt }, loadingCapabilities && styles.disabled]}>
+                {loadingCapabilities ? <ActivityIndicator size="small" color={colors.primary} /> : <Ionicons name="refresh-outline" size={17} color={colors.primary} />}
+                <Text style={[styles.secondaryActionText, { color: colors.primary }]}>Check assistant status again</Text>
+              </Pressable>
             </View>
           </View>
         ) : null}
@@ -516,6 +521,28 @@ export default function ApplicationAssistantScreen() {
         {error ? <Text accessibilityRole="alert" style={[styles.error, { color: colors.red }]}>{error}</Text> : null}
       </ScrollView>
 
+      {consent ? (
+        <View style={[styles.consentBar, styles.acceptedConsentBar, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
+          <Text style={[styles.consentText, { color: colors.muted }]}>
+            Chat processing consent accepted. Documents require separate confirmation.
+          </Text>
+          <Pressable accessibilityRole="button" accessibilityLabel="Withdraw chat processing consent"
+            onPress={() => setConsent(false)} style={styles.withdrawConsentButton}>
+            <Text style={[styles.withdrawConsentText, { color: colors.primary }]}>Withdraw</Text>
+          </Pressable>
+        </View>
+      ) : (
+        <View style={[styles.consentBar, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
+          <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: false }}
+            onPress={() => setConsent(true)} style={styles.consentToggle}>
+            <View style={[styles.fieldCheckbox, { borderColor: colors.border, backgroundColor: colors.background }]} />
+            <Text style={[styles.consentText, { color: colors.muted }]}>
+              I agree to send my chat messages to the application assistant. Documents require a separate confirmation.
+            </Text>
+          </Pressable>
+        </View>
+      )}
+
       <View style={[styles.composer, { backgroundColor: colors.background, borderTopColor: colors.border, paddingBottom: Math.max(insets.bottom, 10) }]}>
         <Pressable accessibilityRole="button" accessibilityLabel="Choose a document to extract"
           disabled={busy || extracting || !consent || !capabilities?.processing_enabled}
@@ -527,7 +554,7 @@ export default function ApplicationAssistantScreen() {
             accessibilityLabel="Message the application assistant"
             value={input}
             onChangeText={setInput}
-            editable={!busy && !!consent && !!capabilities?.processing_enabled}
+            editable={!busy && !!consent}
             multiline
             maxLength={4000}
             placeholder={consent ? 'Describe the application you need…' : 'Accept the processing notice to begin'}
@@ -536,21 +563,9 @@ export default function ApplicationAssistantScreen() {
           />
         </View>
         <Pressable accessibilityRole="button" accessibilityLabel="Send message"
-          disabled={busy || !input.trim() || !consent || !capabilities?.processing_enabled}
-          onPress={() => void sendMessage()} style={[styles.sendButton, { backgroundColor: colors.primary }, (busy || !input.trim() || !consent || !capabilities?.processing_enabled) && styles.disabled]}>
+          disabled={busy || !input.trim() || !consent}
+          onPress={() => void sendMessage()} style={[styles.sendButton, { backgroundColor: colors.primary }, (busy || !input.trim() || !consent) && styles.disabled]}>
           {busy ? <ActivityIndicator color="#FFFFFF" size="small" /> : <Ionicons name="arrow-up" size={21} color="#FFFFFF" />}
-        </Pressable>
-      </View>
-
-      <View style={[styles.consentBar, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
-        <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: consent }}
-          onPress={() => setConsent((value) => !value)} style={styles.consentToggle}>
-          <View style={[styles.fieldCheckbox, { borderColor: consent ? colors.primary : colors.border, backgroundColor: consent ? colors.primarySoft : colors.background }]}>
-            {consent ? <Ionicons name="checkmark" size={14} color={colors.primary} /> : null}
-          </View>
-          <Text style={[styles.consentText, { color: colors.muted }]}>
-            I agree to send my chat messages to the application assistant. Documents require a separate confirmation.
-          </Text>
         </Pressable>
       </View>
 
@@ -645,7 +660,10 @@ const styles = StyleSheet.create({
   sendButton: { width: 42, height: 42, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   consentBar: { borderTopWidth: StyleSheet.hairlineWidth, paddingHorizontal: 13, paddingTop: 7, paddingBottom: 7 },
   consentToggle: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
+  acceptedConsentBar: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   consentText: { flex: 1, fontSize: 10, lineHeight: 15 },
+  withdrawConsentButton: { minHeight: 30, justifyContent: 'center', paddingHorizontal: 6 },
+  withdrawConsentText: { fontSize: 11, fontWeight: '700' },
   disabled: { opacity: 0.5 },
   modalBackdrop: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 22, backgroundColor: 'rgba(0,0,0,0.55)' },
   saveModal: { width: '100%', maxWidth: 400, borderRadius: 20, padding: 20, gap: 11 },
