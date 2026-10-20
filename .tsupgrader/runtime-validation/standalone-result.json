@@ -1,0 +1,176 @@
+{
+  "planHash": "22ac5dd056451d225f5067c831a251ec89f7977798ba00d5bd11abc4945478d1",
+  "phase": "standalone",
+  "recordedAtUtc": "2026-10-20T11:09:02.3504488Z",
+  "retryCount": 3,
+  "resetBaseline": false,
+  "complete": true,
+  "result": {
+    "setupSucceeded": true,
+    "setupDurationMs": 0,
+    "setupFailureOutput": null,
+    "assertions": [
+      {
+        "name": "typecheck",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E hello-app@1.0.0 typecheck\r\n\u003E tsc --noEmit\r\n\r\n",
+        "durationMs": 12007
+      },
+      {
+        "name": "lint",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E hello-app@1.0.0 lint\r\n\u003E expo lint\r\n\r\nenv: load .env\r\nenv: export EXPO_PUBLIC_API_URL EXPO_PUBLIC_FIREBASE_API_KEY EXPO_PUBLIC_FIREBASE_APP_ID EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID EXPO_PUBLIC_FIREBASE_PROJECT_ID GEMINI_MODEL\r\n",
+        "durationMs": 20335
+      },
+      {
+        "name": "tests-pass",
+        "kind": "process",
+        "verificationMethod": "test-results",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E hello-app@1.0.0 test\r\n\u003E node --experimental-strip-types --test src/utils/*.test.js src/state/*.test.js src/services/*.test.js\r\n\r\nTAP version 13\r\n# (node:23184) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/kshit/OneDrive/Desktop/Hello/Hello-app/src/services/application-portal-session.test.js is not specified and it doesn\u0027t parse as CommonJS.\r\n# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.\r\n# To eliminate this warning, add \u0022type\u0022: \u0022module\u0022 to C:\\\\Users\\\\kshit\\\\OneDrive\\\\Desktop\\\\Hello\\\\Hello-app\\\\package.json.\r\n# (Use \u0060node --trace-warnings ...\u0060 to show where the warning was created)\r\n# Subtest: portal handoff accepts HTTPS only and stores selected values in memory\r\nok 1 - portal handoff accepts HTTPS only and stores selected values in memory\r\n  ---\r\n  duration_ms: 5.9032\r\n  type: \u0027test\u0027\r\n  ...\r\n# Subtest: portal handoff rejects credential-bearing URLs\r\nok 2 - portal handoff rejects credential-bearing URLs\r\n  ---\r\n  duration_ms: 0.447\r\n  type: \u0027test\u0027\r\n  ...\r\n# Subtest: a slow refresh cannot undo a saved edit or completion\r\nok 3 - a slow refresh cannot undo a saved edit or completion\r\n  ---\r\n  duration_ms: 3.2609\r\n  type: \u0027test\u0027\r\n  ...\r\n# Subtest: failed mutations preserve data and release the item for retry\r\nok 4 - failed mutations preserve data and release the item for retry\r\n  ---\r\n  duration_ms: 2.3432\r\n  type: \u0027test\u0027\r\n  ...\r\n# Subtest: duplicate mutations are blocked and refresh callers share one request\r\nok 5 - duplicate mutations are blocked and refresh callers share one request\r\n  ---\r\n  duration_ms: 0.6486\r\n  type: \u0027test\u0027\r\n  ...\r\n# Subtest: an unavailable backend keeps loaded data and a successful retry clears the error\r\nok 6 - an unavailable backend keeps loaded data and a successful retry clears the error\r\n  ---\r\n  duration_ms: 0.4684\r\n  type: \u0027test\u0027\r\n  ...\r\n# Subtest: server-rendered snapshot stays stable after client data loads\r\nok 7 - server-rendered snapshot stays stable after client data loads\r\n  ---\r\n  duration_ms: 0.5215\r\n  type: \u0027test\u0027\r\n  ...\r\n# Subtest: creating during the initial load retains both the new and previously saved activities\r\nok 8 - creating during the initial load retains both the new and previously saved activities\r\n  ---\r\n  duration_ms: 2.617\r\n  type: \u0027test\u0027\r\n  ...\r\n# Subtest: a delayed read never resurrects a deleted activity\r\nok 9 - a delayed read never resurrects a deleted activity\r\n  ---\r\n  duration_ms: 0.6222\r\n  type: \u0027test\u0027\r\n  ...\r\n# Subtest: a failed write during a failed initial load does not hide the loading error\r\nok 10 - a failed write during a failed initial load does not hide the loading error\r\n  ---\r\n  duration_ms: 0.5092\r\n  type: \u0027test\u0027\r\n  ...\r\n# Subtest: encrypted document bytes round-trip and reject changed ciphertext\r\nok 11 - encrypted document bytes round-trip and reject changed ciphertext\r\n  ---\r\n  duration_ms: 7.6703\r\n  type: \u0027test\u0027\r\n  ...\r\n# Subtest: binary content is encoded as standard base64 for the OCR request\r\nok 12 - binary content is encoded as standard base64 for the OCR request\r\n  ---\r\n  duration_ms: 0.8038\r\n  type: \u0027test\u0027\r\n  ...\r\n# Subtest: document MIME validation checks the actual file signature\r\nok 13 - document MIME validation checks the actual file signature\r\n  ---\r\n  duration_ms: 0.4522\r\n  type: \u0027test\u0027\r\n  ...\r\n# Subtest: manual KB and MB limits accept fractional sizes and reject invalid and out of range values\r\nok 14 - manual KB and MB limits accept fractional sizes and reject invalid and out of range values\r\n  ---\r\n  duration_ms: 4.4632\r\n  type: \u0027test\u0027\r\n  ...\r\n# Subtest: resizing fits the requested bounds without stretching or upscaling\r\nok 15 - resizing fits the requested bounds without stretching or upscaling\r\n  ---\r\n  duration_ms: 1.6793\r\n  type: \u0027test\u0027\r\n  ...\r\n# Subtest: manual compression checks actual bytes and reduces dimensions after quality attempts\r\nok 16 - manual compression checks actual bytes and reduces dimensions after quality attempts\r\n  ---\r\n  duration_ms: 1.0377\r\n  type: \u0027test\u0027\r\n  ...\r\n# Subtest: already small encoded output is retained without padding \n\u2026[truncated]",
+        "durationMs": 2316,
+        "testResults": {
+          "testFramework": "unknown",
+          "runnerDetectedFrom": "none",
+          "testsTotal": 0,
+          "testsPassed": 0,
+          "testsFailed": 0,
+          "testsSkipped": 0,
+          "parseFailed": true
+        }
+      },
+      {
+        "name": "web-bundle",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "env: load .env\r\nenv: export EXPO_PUBLIC_API_URL EXPO_PUBLIC_FIREBASE_API_KEY EXPO_PUBLIC_FIREBASE_APP_ID EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID EXPO_PUBLIC_FIREBASE_PROJECT_ID GEMINI_MODEL\r\nUsing src/app as the root directory for Expo Router.\r\nReact Compiler enabled\r\nStarting Metro Bundler\r\n\r\nStatic rendering is enabled. Learn more: https://docs.expo.dev/router/web/static-rendering/\r\n\u03BB Bundled 3099ms node_modules\\expo\\node_modules\\@expo\\cli\\node_modules\\@expo\\router-server\\node\\render.js (1291 modules)\r\n[expo-notifications] Listening to push token changes is not yet fully supported on web. Adding a listener will have no effect.\r\nWeb Bundled 3599ms node_modules\\expo-router\\entry.js (1360 modules)\r\n\r\n\u203A web bundles (3):\r\n_expo/static/css/global-5568debfbd0b7b19f5b7be6079e225f9.css (972B)\r\n_expo/static/js/web/entry-06dafee775fb928ec8b8b6bdf1c7f88b.js (3.2MB)\r\n_expo/static/js/web/pdf-cb94937a8513078f10157e0a9aeff0d9.js (608KB)\r\n\r\n\u203A Static routes (24):\r\n/ (index) (22KB)\r\n/meals (22KB)\r\n/steps (22KB)\r\n/tasks (22KB)\r\n/vault (22KB)\r\n/events (22KB)\r\n/family (22KB)\r\n/weight (22KB)\r\n/account (22KB)\r\n/weather (22KB)\r\n/schedule (22KB)\r\n/_sitemap (20KB)\r\n/\u002Bnot-found (20KB)\r\n/tabs (22KB)\r\n/screen-time (22KB)\r\n/tabs/camera (22KB)\r\n/tabs/wishes (22KB)\r\n/applications (22KB)\r\n/tabs/explore (22KB)\r\n/notifications (22KB)\r\n/tabs/messages (22KB)\r\n/tabs/schedule (22KB)\r\n/document-tools (22KB)\r\n/application-portal (22KB)\r\n\r\nExported: dist\r\n",
+        "durationMs": 8973
+      },
+      {
+        "name": "android-bundle",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "env: load .env\r\nenv: export EXPO_PUBLIC_API_URL EXPO_PUBLIC_FIREBASE_API_KEY EXPO_PUBLIC_FIREBASE_APP_ID EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID EXPO_PUBLIC_FIREBASE_PROJECT_ID GEMINI_MODEL\r\nUsing src/app as the root directory for Expo Router.\r\nReact Compiler enabled\r\nStarting Metro Bundler\r\n\r\nAndroid Bundled 12896ms node_modules\\expo-router\\entry.js (1782 modules)\r\n\r\n\u203A Assets (46):\r\nnode_modules\\@expo-google-fonts\\material-symbols\\400Regular\\MaterialSymbols_400Regular.ttf (967KB)\r\nnode_modules\\@expo\\vector-icons\\build\\vendor\\react-native-vector-icons\\Fonts\\AntDesign.ttf (130KB)\r\nnode_modules\\@expo\\vector-icons\\build\\vendor\\react-native-vector-icons\\Fonts\\Entypo.ttf (66KB)\r\nnode_modules\\@expo\\vector-icons\\build\\vendor\\react-native-vector-icons\\Fonts\\EvilIcons.ttf (13KB)\r\nnode_modules\\@expo\\vector-icons\\build\\vendor\\react-native-vector-icons\\Fonts\\Feather.ttf (56KB)\r\nnode_modules\\@expo\\vector-icons\\build\\vendor\\react-native-vector-icons\\Fonts\\FontAwesome.ttf (166KB)\r\nnode_modules\\@expo\\vector-icons\\build\\vendor\\react-native-vector-icons\\Fonts\\FontAwesome5_Brands.ttf (134KB)\r\nnode_modules\\@expo\\vector-icons\\build\\vendor\\react-native-vector-icons\\Fonts\\FontAwesome5_Regular.ttf (34KB)\r\nnode_modules\\@expo\\vector-icons\\build\\vendor\\react-native-vector-icons\\Fonts\\FontAwesome5_Solid.ttf (203KB)\r\nnode_modules\\@expo\\vector-icons\\build\\vendor\\react-native-vector-icons\\Fonts\\FontAwesome6_Brands.ttf (209KB)\r\nnode_modules\\@expo\\vector-icons\\build\\vendor\\react-native-vector-icons\\Fonts\\FontAwesome6_Regular.ttf (68KB)\r\nnode_modules\\@expo\\vector-icons\\build\\vendor\\react-native-vector-icons\\Fonts\\FontAwesome6_Solid.ttf (424KB)\r\nnode_modules\\@expo\\vector-icons\\build\\vendor\\react-native-vector-icons\\Fonts\\Fontisto.ttf (314KB)\r\nnode_modules\\@expo\\vector-icons\\build\\vendor\\react-native-vector-icons\\Fonts\\Foundation.ttf (57KB)\r\nnode_modules\\@expo\\vector-icons\\build\\vendor\\react-native-vector-icons\\Fonts\\Ionicons.ttf (390KB)\r\nnode_modules\\@expo\\vector-icons\\build\\vendor\\react-native-vector-icons\\Fonts\\MaterialCommunityIcons.ttf (1.3MB)\r\nnode_modules\\@expo\\vector-icons\\build\\vendor\\react-native-vector-icons\\Fonts\\MaterialIcons.ttf (357KB)\r\nnode_modules\\@expo\\vector-icons\\build\\vendor\\react-native-vector-icons\\Fonts\\Octicons.ttf (69KB)\r\nnode_modules\\@expo\\vector-icons\\build\\vendor\\react-native-vector-icons\\Fonts\\SimpleLineIcons.ttf (54KB)\r\nnode_modules\\@expo\\vector-icons\\build\\vendor\\react-native-vector-icons\\Fonts\\Zocial.ttf (26KB)\r\nnode_modules\\expo-router\\assets\\arrow_down.png (9.5KB)\r\nnode_modules\\expo-router\\assets\\arrow_right.xml (307B)\r\nnode_modules\\expo-router\\assets\\checkmark.xml (312B)\r\nnode_modules\\expo-router\\assets\\error.png (469B)\r\nnode_modules\\expo-router\\assets\\file.png (138B)\r\nnode_modules\\expo-router\\assets\\forward.png (188B)\r\nnode_modules\\expo-router\\assets\\pkg.png (364B)\r\nnode_modules\\expo-router\\assets\\react-navigation\\elements\\back-icon-mask.png (653B)\r\nnode_modules\\expo-router\\assets\\react-navigation\\elements\\back-icon.png (4 variations | 152B)\r\nnode_modules\\expo-router\\assets\\react-navigation\\elements\\clear-icon.png (4 variations | 425B)\r\nnode_modules\\expo-router\\assets\\react-navigation\\elements\\close-icon.png (4 variations | 235B)\r\nnode_modules\\expo-router\\assets\\react-navigation\\elements\\search-icon.png (4 variations | 599B)\r\nnode_modules\\expo-router\\assets\\sitemap.png (465B)\r\nnode_modules\\expo-router\\assets\\unmatched.png (4.8KB)\r\n\r\n\u203A android bundles (1):\r\n_expo/static/js/android/entry-d9736e2002e7f59eb41bff8fbc4c301f.hbc (5.3MB)\r\n\r\n\u203A Files (1):\r\nmetadata.json (3.1KB)\r\n\r\nExported: dist\r\n",
+        "durationMs": 17124
+      },
+      {
+        "name": "dev-server-home-200",
+        "kind": "http-probe",
+        "verificationMethod": "http-status",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": null,
+        "outputSample": "HTTP 200\n\u003C!DOCTYPE html\u003E\u003Chtml  lang=\u0022en\u0022\u003E\u003Chead\u003E\u003Ctitle data-rh=\u0022true\u0022\u003E\u003C/title\u003E\u003Cmeta charSet=\u0022utf-8\u0022/\u003E\u003Cmeta name=\u0022viewport\u0022 content=\u0022width=device-width, initial-scale=1, shrink-to-fit=no\u0022/\u003E\u003Cmeta http-equiv=\u0022X-UA-Compatible\u0022 content=\u0022IE=edge\u0022/\u003E\u003Cstyle id=\u0022expo-reset\u0022\u003E#root,body,html{height:100%}body{overflow:hidden}#root{display:flex}\u003C/style\u003E\u003Cstyle id=\u0022react-native-stylesheet\u0022\u003E[stylesheet-group=\u00220\u0022]{}\nbody{margin:0;}\nbutton::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0;}\nhtml{-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:rgba(0,0,0,0);}\ninput::-webkit-search-cancel-button,input::-webkit-search-decoration,input::-webkit-search-results-button,input::-webkit-search-results-decoration{display:none;}\n[stylesheet-group=\u00221\u0022]{}\n.css-accessibilityImage-9pa8cd{bottom:0px;height:100%;left:0px;opacity:0;position:absolute;right:0px;top:0px;width:100%;z-index:-1;}\n.css-text-146c3p1{background-color:rgba(0,0,0,0.00);border:0 solid black;box-sizing:border-box;color:rgba(0,0,0,1.00);display:inline;font:14px -apple-system,BlinkMacSystemFont,\u0022Segoe UI\u0022,Roboto,Helvetica,Arial,sans-serif;list-style:none;margin:0px;padding:0px;position:relative;text-align:start;text-decoration:none;white-space:pre-wrap;word-wrap:break-word;}\n.css-textHasAncestor-1jxf684{background-color:rgba(0,0,0,0.00);border:0 solid black;box-sizing:border-box;color:inherit;display:inline;font:inherit;list-style:none;margin:0px;padding:0px;position:relative;text-align:inherit;text-decoration:none;white-space:inherit;word-wrap:break-word;}\n.css-textinput-11aywtz{-moz-appearance:textfield;-webkit-appearance:none;background-color:rgba(0,0,0,0.00);border-bottom-left-radius:0px;border-bottom-right-radius:0px;border-top-left-radius:0px;border-top-right-radius:0px;border:0 solid black;box-sizing:border-box;font:14px -apple-system,BlinkMacSystemFont,\u0022Segoe UI\u0022,Roboto,Helvetica,Arial,sans-serif;margin:0px;padding:0px;resize:none;}\n.css-view-g5y9jx{align-content:flex-start;align-items:stretch;background-color:rgba(0,0,0,0.00);border:0 solid black;box-sizing:border-box;display:flex;flex-basis:auto;flex-direction:column;flex-shrink:0;list-style:none;margin:0px;min-height:0px;min-width:0px;padding:0px;position:relative;text-decoration:none;z-index:0;}\n[stylesheet-group=\u00222\u0022]{}\n.r-borderColor-11mg6pl{border-bottom-color:rgba(255,255,255,1.00);border-left-color:rgba(255,255,255,1.00);border-right-color:rgba(255,255,255,1.00);border-top-color:rgba(255,255,255,1.00);}\n.r-borderColor-1awa8pu{border-bottom-color:rgba(101,119,134,1.00);border-left-color:rgba(101,119,134,1.00);border-right-color:rgba(101,119,134,1.00);border-top-color:rgba(101,119,134,1.00);}\n.r-borderColor-1bvvwek{border-bottom-color:rgba(0,0,0,0.09);border-left-color:rgba(0,0,0,0.09);border-right-color:rgba(0,0,0,0.09);border-top-color:rgba(0,0,0,0.09);}\n.r-borderColor-1d4xg89{border-bottom-color:rgba(170,184,194,1.00);border-left-color:rgba(170,184,194,1.00);border-right-color:rgba(170,184,194,1.00);border-top-color:rgba(170,184,194,1.00);}\n.r-borderColor-1jyn79y{border-bottom-color:rgba(0,150,136,1.00);border-left-color:rgba(0,150,136,1.00);border-right-color:rgba(0,150,136,1.00);border-top-color:rgba(0,150,136,1.00);}\n.r-borderColor-1rvyss1{border-bottom-color:rgba(255,255,255,0.20);border-left-color:rgba(255,255,255,0.20);border-right-color:rgba(255,255,255,0.20);border-top-color:rgba(255,255,255,0.20);}\n.r-borderColor-4a18lf{border-bottom-color:rgba(255,0,0,1.00);border-left-color:rgba(255,0,0,1.00);border-right-color:rgba(255,0,0,1.00);border-top-color:rgba(255,0,0,1.00);}\n.r-borderColor-60ke3l{border-bottom-color:rgba(0,128,0,1.00);border-left-color:rgba(0,128,0,1.00);border-right-color:rgba(0,128,0,1.00);border-top-color:rgba(0,128,0,1.00);}\n.r-borderColor-9x6qib{border-bottom-color:rgba(204,214,221,1.00);border-left-color:rgba(204,214,221,1.00);border-right-color:rgba(204,214,221,1.00);border-top-color:rgba(204,214,221,1.00);}\n.r-borderColor-fx7oqy{border-bottom-color:rgba(0,0,255,1.00);border-left-color:rgba(0,0,255,1.00);border-right-color:rgba(0,0,255,1.00);border-to\n\u2026[truncated]",
+        "durationMs": 25372
+      }
+    ],
+    "executions": [
+      {
+        "source": "typecheck",
+        "resolvedExecutable": "C:\\nvm4w\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "typecheck"
+        ],
+        "cwd": "C:\\Users\\kshit\\OneDrive\\Desktop\\Hello\\Hello-app",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "lint",
+        "resolvedExecutable": "C:\\nvm4w\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "lint"
+        ],
+        "cwd": "C:\\Users\\kshit\\OneDrive\\Desktop\\Hello\\Hello-app",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "tests-pass",
+        "resolvedExecutable": "C:\\nvm4w\\nodejs\\npm.CMD",
+        "args": [
+          "test"
+        ],
+        "cwd": "C:\\Users\\kshit\\OneDrive\\Desktop\\Hello\\Hello-app",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "web-bundle",
+        "resolvedExecutable": "C:\\nvm4w\\nodejs\\node.EXE",
+        "args": [
+          "node_modules/expo/bin/cli",
+          "export",
+          "--platform",
+          "web"
+        ],
+        "cwd": "C:\\Users\\kshit\\OneDrive\\Desktop\\Hello\\Hello-app",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "android-bundle",
+        "resolvedExecutable": "C:\\nvm4w\\nodejs\\node.EXE",
+        "args": [
+          "node_modules/expo/bin/cli",
+          "export",
+          "--platform",
+          "android"
+        ],
+        "cwd": "C:\\Users\\kshit\\OneDrive\\Desktop\\Hello\\Hello-app",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "dev-server-home-200",
+        "resolvedExecutable": "C:\\nvm4w\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "web",
+          "--",
+          "--port",
+          "8093"
+        ],
+        "cwd": "C:\\Users\\kshit\\OneDrive\\Desktop\\Hello\\Hello-app",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      }
+    ]
+  }
+}

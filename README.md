@@ -47,6 +47,10 @@ Family document sharing is separate from the device-only Private Vault. The owne
 
 Document OCR is optional and uses the existing server-side `GEMINI_API_KEY`. Each extraction requires explicit confirmation and sends a decrypted copy over HTTPS through the backend to Google Gemini. The app backend does not persist the document; Google processes it under its own service terms. Do not send documents unless you accept those terms. Extracted values are estimates, must be checked against the original, and should not be relied on for official, legal, or financial decisions. Extracted fields are masked until revealed and are encrypted in the local vault. Documents over 6 MB can be saved but not OCR-processed.
 
+The Application assistant is available from the floating chatbot button on Home. It can research application services online and cite official sources, but it may not find every service or establish that a site is official; confirm the authority and details with the issuing institution. Chat and selected documents are sent to the backend and Google Gemini only after consent. On the backend, `APPLICATIONS_PERSONAL_DATA_ENABLED` defaults to `false`; enable it only after confirming an actively billed Gemini project and reviewing the applicable data-processing terms. Saved assistant drafts are encrypted in the Private Vault.
+
+On Android and iOS, the guided portal browser can detect and fill some ordinary web-form fields using values the user has already reviewed. The user confirms the portal host before filling and confirms standard form submissions separately. Values stay in memory and are sent to the portal only when the user chooses to fill them. Password, OTP, CAPTCHA, payment-card, and file-upload fields are not autofilled; login, verification, and payment remain manual. Site-specific or scripted flows may not be detected or may behave differently, so inspect every page and complete unsupported steps manually. Web builds open the official link separately and do not autofill. This is best-effort browser assistance, not a tested integration for every portal; it does not verify successful submission, application status, approval, or certificate issuance.
+
 Set `EXPO_PUBLIC_API_URL` in `Hello-app/.env` if automatic development host detection does not suit your setup. The URL must include `/api`, for example `http://192.168.1.10:8000/api` for a phone on the same LAN. Restart Expo after changing this variable. Without an explicit URL, the app uses the Expo development host, `10.0.2.2` on an Android emulator, or `localhost` on web.
 
 ## Production deployment (Railway + MongoDB Atlas)
@@ -58,6 +62,7 @@ This project is mobile-focused and does not include public web hosting. Deploy t
 - `FIREBASE_PROJECT_ID` and `FIREBASE_SERVICE_ACCOUNT_JSON` for the same Firebase project
 - `CORS_ORIGINS` as an empty value for mobile-only use. If a browser client is added later, list only its exact HTTPS origin(s), comma-separated.
 - `GEMINI_API_KEY` only if food photo analysis is enabled; keep it server-side.
+- `APPLICATIONS_PERSONAL_DATA_ENABLED=false` by default. Enable the application assistant only after confirming active Gemini billing and reviewing the provider's data-processing terms. `APPLICATIONS_GEMINI_MODEL` selects its model; `GEMINI_API_KEY` remains server-side.
 
 In Atlas, create a least-privilege database user and restrict network access to the Railway service's static egress IP or private network. Do not leave Atlas open to `0.0.0.0/0` for production. Store credentials in Railway variables, never in Git or the Expo bundle. The production API disables interactive docs and requires verified Firebase ID tokens; schedule, life-item, and food-analysis records are isolated by Firebase user ID.
 

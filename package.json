@@ -47,6 +47,7 @@
     "react-native-screens": "~4.26.0",
     "react-native-svg": "15.15.4",
     "react-native-web": "~0.21.0",
+    "react-native-webview": "13.16.1",
     "react-native-worklets": "0.10.1"
   },
   "devDependencies": {
@@ -65,7 +66,7 @@
     "postinstall": "patch-package --error-on-fail && node scripts/prepare-document-tools.cjs",
     "release:check": "node --env-file-if-exists=.env scripts/check-release-config.cjs",
     "eas-build-post-install": "node scripts/check-release-config.cjs --eas",
-    "test": "node --experimental-strip-types --test src/utils/*.test.js src/state/*.test.js",
+    "test": "node --experimental-strip-types --test src/utils/*.test.js src/state/*.test.js src/services/*.test.js",
     "test:pdf-runtime": "node scripts/check-pdf-runtime.cjs",
     "typecheck": "tsc --noEmit",
     "start": "expo start",

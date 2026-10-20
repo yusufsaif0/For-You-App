@@ -11,6 +11,7 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { extractDocumentFields } from '@/services/api/document-ocr';
 import { publishVaultDocument } from '@/services/family-documents';
+import { stageApplicationDraft } from '@/services/application-drafts';
 import {
   decryptDocument, deleteEncryptedDocument, exportDecryptedDocument, saveEncryptedDocument,
 } from '@/services/document-vault';
@@ -32,7 +33,7 @@ const recordTypes: { value: VaultRecordType; title: string; icon: keyof typeof I
   { value: 'card', title: 'Payment card', icon: 'card-outline' },
 ];
 
-const fieldsByType: Record<VaultRecordType, { key: string; label: string; secure?: boolean; keyboard?: 'default' | 'url' }[]> = {
+const fieldsByType: Partial<Record<VaultRecordType, { key: string; label: string; secure?: boolean; keyboard?: 'default' | 'url' }[]>> = {
   login: [
     { key: 'website', label: 'Website or app name' },
     { key: 'username', label: 'Username or email' },
@@ -233,6 +234,8 @@ export default function VaultScreen({ openToolsOnUnlock = false }: { openToolsOn
   const filterTitle = useMemo(() => {
     const typeTitle = filter === 'all'
       ? 'All items'
+      : filter === 'applications'
+        ? 'Application drafts'
       : filter === 'documents'
         ? 'Documents'
         : filter.startsWith('category:')
@@ -245,9 +248,10 @@ export default function VaultScreen({ openToolsOnUnlock = false }: { openToolsOn
     const query = searchQuery.trim().toLowerCase();
     return records.filter((record) => {
       const matchesCategory = filter === 'all' ||
+        (filter === 'applications' && record.type === 'application') ||
         (filter === 'documents' && record.type === 'document') ||
         (filter.startsWith('category:') && record.type === 'document' && record.documentCategory === filter.slice(9)) ||
-        (!filter.startsWith('category:') && filter !== 'documents' && record.type === filter);
+        (!filter.startsWith('category:') && filter !== 'documents' && filter !== 'applications' && record.type === filter);
       const matchesFileType = fileTypeFilter === 'all' || (
         record.type === 'document' &&
         (fileTypeFilter === 'pdf'
@@ -339,7 +343,7 @@ export default function VaultScreen({ openToolsOnUnlock = false }: { openToolsOn
     setEditingId(record?.id ?? '');
     setDraft(record
       ? Object.fromEntries(Object.entries(record).filter(([key, value]) =>
-        (key === 'title' || key === 'notes' || fieldsByType[type].some((field) => field.key === key)) &&
+        (key === 'title' || key === 'notes' || fieldsByType[type]?.some((field) => field.key === key)) &&
         typeof value === 'string')) as Draft
       : emptyDraft());
     setError('');
@@ -611,6 +615,19 @@ export default function VaultScreen({ openToolsOnUnlock = false }: { openToolsOn
     );
   };
 
+  const resumeApplicationDraft = (record: VaultRecord) => {
+    if (!record.applicationData) {
+      setError('This application draft is missing its encrypted content.');
+      return;
+    }
+    try {
+      stageApplicationDraft(record.applicationData);
+      router.navigate('/applications');
+    } catch (failure) {
+      setError(failure instanceof Error ? failure.message : 'Could not open this application draft.');
+    }
+  };
+
   const deleteRecord = (record: VaultRecord) => {
     setDeleteTarget(record);
   };
@@ -643,7 +660,9 @@ export default function VaultScreen({ openToolsOnUnlock = false }: { openToolsOn
 
   const typeTitle = (type: VaultRecordType) => type === 'document'
     ? 'Private document'
-    : recordTypes.find((item) => item.value === type)?.title ?? type;
+    : type === 'application'
+      ? 'Application draft'
+      : recordTypes.find((item) => item.value === type)?.title ?? type;
   const visibleSecret = (record: VaultRecord) => {
     if (revealedId !== record.id) return '••••••••';
     if (record.type === 'login') return record.password;
@@ -670,6 +689,8 @@ export default function VaultScreen({ openToolsOnUnlock = false }: { openToolsOn
         { label: 'Card', value: visibleSecret(record), secret: true },
         { label: 'Expiry', value: record.expiry },
       );
+    } else if (record.type === 'application') {
+      rows.push({ label: 'Draft', value: record.notes });
     }
     if (record.notes) rows.push({ label: 'Notes', value: record.notes });
     return rows.filter((row) => row.value);
@@ -806,17 +827,19 @@ export default function VaultScreen({ openToolsOnUnlock = false }: { openToolsOn
             <View key={record.id} style={[styles.recordCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
               <View style={styles.recordHeader}>
                 <View style={[styles.recordIcon, { backgroundColor: colors.primarySoft }]}>
-                  <Ionicons name={record.type === 'document' ? 'document-lock-outline' : recordTypes.find((item) => item.value === record.type)?.icon ?? 'key-outline'} size={18} color={colors.primary} />
+                  <Ionicons name={record.type === 'document' ? 'document-lock-outline' : record.type === 'application' ? 'document-text-outline' : recordTypes.find((item) => item.value === record.type)?.icon ?? 'key-outline'} size={18} color={colors.primary} />
                 </View>
                 <View style={styles.recordTitleBlock}>
                   <Text style={[styles.recordTitle, { color: colors.text }]} numberOfLines={1}>{record.title}</Text>
                   <Text style={[styles.recordType, { color: colors.muted }]}>{record.documentCategory ?? typeTitle(record.type)}</Text>
                 </View>
-                <Pressable accessibilityRole="button" accessibilityLabel={revealedId === record.id ? `Hide ${record.title} secrets` : `Reveal ${record.title} secrets`}
-                  onPress={() => setRevealedId(revealedId === record.id ? '' : record.id)} style={styles.recordAction}>
-                  <Ionicons name={revealedId === record.id ? 'eye-off-outline' : 'eye-outline'} size={19} color={colors.primary} />
-                </Pressable>
-                {record.type !== 'document' ? (
+                {record.type !== 'application' ? (
+                  <Pressable accessibilityRole="button" accessibilityLabel={revealedId === record.id ? `Hide ${record.title} secrets` : `Reveal ${record.title} secrets`}
+                    onPress={() => setRevealedId(revealedId === record.id ? '' : record.id)} style={styles.recordAction}>
+                    <Ionicons name={revealedId === record.id ? 'eye-off-outline' : 'eye-outline'} size={19} color={colors.primary} />
+                  </Pressable>
+                ) : null}
+                {record.type !== 'document' && record.type !== 'application' ? (
                   <Pressable accessibilityRole="button" accessibilityLabel={`Edit ${record.title}`} onPress={() => openForm(record.type, record)} style={styles.recordAction}>
                     <Ionicons name="create-outline" size={19} color={colors.muted} />
                   </Pressable>
@@ -874,6 +897,13 @@ export default function VaultScreen({ openToolsOnUnlock = false }: { openToolsOn
                   <Text selectable={false} style={[styles.detailValue, { color: colors.text }]} numberOfLines={2}>{row.value}</Text>
                 </View>
               ))}
+              {record.type === 'application' ? (
+                <Pressable accessibilityRole="button" disabled={busy} onPress={() => resumeApplicationDraft(record)}
+                  style={[styles.documentAction, { backgroundColor: colors.primarySoft, alignSelf: 'flex-start', marginTop: 8 }]}>
+                  <Ionicons name="chatbubble-ellipses-outline" size={16} color={colors.primary} />
+                  <Text style={[styles.documentActionText, { color: colors.primary }]}>Resume draft</Text>
+                </Pressable>
+              ) : null}
             </View>
           )) : (
             <View style={[styles.emptyCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
@@ -910,6 +940,7 @@ export default function VaultScreen({ openToolsOnUnlock = false }: { openToolsOn
                 {[
                   { value: 'all', title: 'All' },
                   { value: 'documents', title: 'Documents' },
+                  { value: 'applications', title: 'Application drafts' },
                   ...recordTypes.map(({ value, title }) => ({ value, title })),
                   ...documentCategoryFilters.map((title) => ({ value: `category:${title}`, title })),
                 ].map((item) => (
@@ -1016,7 +1047,7 @@ export default function VaultScreen({ openToolsOnUnlock = false }: { openToolsOn
                 <Text style={[styles.cardNotice, { color: colors.red }]}>Only save the last four digits. Do not enter the full card number, CVV, PIN, or upload a card photo.</Text>
               ) : null}
               <VaultInput label="Entry name" value={draft.title ?? ''} onChangeText={(value) => setDraft((previous) => ({ ...previous, title: value }))} colors={colors} autoCapitalize="words" />
-              {formType ? fieldsByType[formType].map((field) => (
+              {formType ? fieldsByType[formType]?.map((field) => (
                 <VaultInput key={field.key} label={field.label} value={draft[field.key] ?? ''}
                   onChangeText={(value) => setDraft((previous) => ({ ...previous, [field.key]: value }))}
                   colors={colors} secure={field.secure} keyboard={field.keyboard}

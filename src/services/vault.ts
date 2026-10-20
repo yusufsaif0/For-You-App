@@ -5,7 +5,7 @@ import { Platform } from 'react-native';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils.js';
 import { decryptVaultData, deriveWebVaultKey, encryptVaultData } from '@/utils/vaultCrypto';
 
-export type VaultRecordType = 'login' | 'pin' | 'bank' | 'card' | 'document';
+export type VaultRecordType = 'login' | 'pin' | 'bank' | 'card' | 'document' | 'application';
 
 export interface VaultDocumentField {
   label: string;
@@ -34,6 +34,7 @@ export interface VaultRecord {
   documentSize?: number;
   extractedDocumentType?: string;
   extractedFields?: VaultDocumentField[];
+  applicationData?: string;
   notes?: string;
   createdAt: string;
   updatedAt: string;
@@ -75,7 +76,7 @@ function validateRecords(value: unknown): VaultRecord[] {
   if (!Array.isArray(value) || value.some((item) =>
     typeof item !== 'object' || item === null ||
     !('id' in item) || typeof item.id !== 'string' ||
-    !('type' in item) || !['login', 'pin', 'bank', 'card', 'document'].includes(String(item.type)) ||
+    !('type' in item) || !['login', 'pin', 'bank', 'card', 'document', 'application'].includes(String(item.type)) ||
     !('title' in item) || typeof item.title !== 'string' ||
     !('createdAt' in item) || typeof item.createdAt !== 'string' ||
     !('updatedAt' in item) || typeof item.updatedAt !== 'string' ||
@@ -89,6 +90,10 @@ function validateRecords(value: unknown): VaultRecord[] {
         typeof field !== 'object' || field === null ||
         !('label' in field) || typeof field.label !== 'string' ||
         !('value' in field) || typeof field.value !== 'string')))
+    )) ||
+    ('type' in item && item.type === 'application' && (
+      !('applicationData' in item) || typeof item.applicationData !== 'string' ||
+      item.applicationData.length > 100_000
     )) ||
     ('type' in item && item.type === 'card' && ['cardNumber', 'fullCardNumber', 'cvv', 'cvc', 'securityCode', 'photo', 'cardPhoto', 'photoUri'].some((field) => field in item))
   )) {

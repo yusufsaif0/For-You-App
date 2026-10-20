@@ -211,6 +211,17 @@ export default function HomeScreen() {
         <FinanceSummary />
 
       </ScrollView>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Open application assistant"
+        onPress={() => router.navigate('/applications')}
+        style={[styles.assistantButton, { backgroundColor: colors.primary, borderColor: colors.background }]}
+      >
+        <Ionicons name="chatbubbles" size={24} color="#FFFFFF" />
+        <View style={styles.assistantSparkle}>
+          <Ionicons name="sparkles" size={12} color="#FFFFFF" />
+        </View>
+      </Pressable>
     </SafeAreaView>
   );
 }
@@ -223,6 +234,8 @@ const styles = StyleSheet.create({
   greeting: { fontSize: 24, fontWeight: '800', letterSpacing: -0.6 },
   wave: { color: '#F4B544' },
   themeButton: { width: 44, height: 44, borderRadius: 16, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  assistantButton: { position: 'absolute', right: 18, bottom: 84, width: 58, height: 58, borderRadius: 22, borderWidth: 3, alignItems: 'center', justifyContent: 'center', elevation: 7, shadowColor: '#000000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.22, shadowRadius: 6 },
+  assistantSparkle: { position: 'absolute', right: 5, top: 4, width: 20, height: 20, borderRadius: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: '#7D61E8', borderWidth: 2, borderColor: '#FFFFFF' },
   hero: { minHeight: 220, borderRadius: 26, padding: 20, overflow: 'hidden', justifyContent: 'center' },
   heroContent: { zIndex: 1 },
   weatherHeroHeading: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 },

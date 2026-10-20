@@ -1,0 +1,62 @@
+{
+  "generatedAt": "2026-10-20T10:30:00Z",
+  "generatedOnPlatform": "win32",
+  "projectType": "webapp",
+  "assertions": [
+    {
+      "name": "typecheck",
+      "kind": "process",
+      "command": "npm",
+      "args": ["run", "typecheck"],
+      "verificationMethod": "exit-code",
+      "expected": "0",
+      "timeoutSeconds": 180
+    },
+    {
+      "name": "lint",
+      "kind": "process",
+      "command": "npm",
+      "args": ["run", "lint"],
+      "verificationMethod": "exit-code",
+      "expected": "0",
+      "timeoutSeconds": 180
+    },
+    {
+      "name": "tests-pass",
+      "kind": "process",
+      "command": "npm",
+      "args": ["test"],
+      "verificationMethod": "test-results",
+      "expected": "0",
+      "timeoutSeconds": 300
+    },
+    {
+      "name": "web-bundle",
+      "kind": "process",
+      "command": "node",
+      "args": ["node_modules/expo/bin/cli", "export", "--platform", "web"],
+      "verificationMethod": "exit-code",
+      "expected": "0",
+      "timeoutSeconds": 360
+    },
+    {
+      "name": "android-bundle",
+      "kind": "process",
+      "command": "node",
+      "args": ["node_modules/expo/bin/cli", "export", "--platform", "android"],
+      "verificationMethod": "exit-code",
+      "expected": "0",
+      "timeoutSeconds": 360
+    },
+    {
+      "name": "dev-server-home-200",
+      "kind": "http-probe",
+      "startCommand": "npm",
+      "startArgs": ["run", "web", "--", "--port", "8093"],
+      "url": "http://localhost:8093/",
+      "verificationMethod": "http-status",
+      "expected": "200",
+      "timeoutSeconds": 120
+    }
+  ]
+}
