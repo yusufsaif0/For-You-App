@@ -8,6 +8,7 @@ node_modules/
 dist/
 dist-android/
 web-build/
+/public/document-tools/
 expo-env.d.ts
 
 # Native

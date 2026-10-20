@@ -65,6 +65,17 @@ For the mobile release, set `EXPO_PUBLIC_API_URL` to the Railway HTTPS URL endin
 
 Existing MongoDB schedule and life-item records without `user_id` will no longer be returned after authentication is enabled. Do not automatically assign shared legacy records to an arbitrary account. Before migration, back up the database and decide explicitly which verified Firebase UID owns each legacy dataset; update only records whose ownership is known, or start with an empty production database. Validate the migration in a separate database before touching production.
 
+## Document tools and Private vault
+
+Open **Document tools** from the toolkit menu or **Compress / convert** on a vault document. Unlock/create the same Private vault first. A new PDF/JPG/PNG/WebP upload is automatically encrypted and saved before processing; existing vault documents can also be selected. Originals are preserved. Results are saved as separate encrypted vault documents in the source category (new uploads use Other), with individual export actions and before/after sizes. All processing is local, without backend or third-party file uploads.
+
+- **Auto** compression balances JPEG quality and dimensions (maximum edge 2400 pixels). **Manual size** includes a KB/MB selector and accepts a maximum output size from 1 KB to 20 MB, including values such as 200 KB or 0.5 MB (1 MB = 1024 KB). The encoder retries with lower quality/resolution and verifies actual output bytes. Already-small originals are kept; unreachable limits show an error instead of saving an oversized result.
+- **Resize image** preserves aspect ratio, with optional width/height bounds in manual mode. It does not upscale. Compressed/resized images become JPG and transparency is flattened.
+- **PDF to JPG** creates one numbered JPG per page. **JPG to PDF** also accepts PNG/WebP and creates a single-page PDF. PDF compression creates image-based pages: the new copy loses selectable text, links, editable forms, and digital signatures. Keep the original for those features.
+- Inputs and individual outputs are limited to 20 MB; PDFs to 60 pages; a PDF-to-JPG batch to 40 MB of output. A multi-page conversion is saved as a batch; if saving fails before the index is committed, the newly encrypted files are removed.
+- PDF compression/rendering works in a custom **Android build** and **web**. Android uses the OS PDF renderer and needs a rebuild/reinstall after this change; Expo Go cannot render PDFs. iOS currently supports image compression/resizing and image-to-PDF, but PDF rendering/compression is not implemented there. Web ships its PDF.js worker, CMaps, fonts and WASM locally via `scripts/prepare-document-tools.cjs` during `npm install`; no CDN is required.
+- Closing the tool or locking/backgrounding the vault cancels further processing/saving; normal temporary file cleanup runs when the in-flight native work finishes. Export intentionally creates a decrypted copy outside the vault. Documents remain device/browser-local and are not synced or backed up.
+
 ## Daily features
 
 - The Home dashboard provides entry points to schedules, meal/calorie logs, weight check-ins, office tasks, and upcoming events.
@@ -120,6 +131,7 @@ Frontend (Node 22.13 or later):
 ```powershell
 cd Hello-app
 npm test
+npm run test:pdf-runtime
 npm run typecheck
 npx expo export --platform web --max-workers 2
 npx expo export --platform android --max-workers 2 --output-dir dist-android

@@ -1,11 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router, useFocusEffect } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, Linking, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { aqiDescription, getLocalWeather, type LocalWeather } from '@/services/weather';
 import { useAppTheme } from '@/state/ThemeProvider';
+import { goBackOrHome } from '@/services/navigation';
 
 export default function WeatherScreen() {
   const { colors, theme } = useAppTheme();
@@ -32,7 +33,7 @@ export default function WeatherScreen() {
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
-        <Pressable accessibilityRole="button" accessibilityLabel="Go back" onPress={() => router.back()} style={styles.back}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Go back" onPress={goBackOrHome} style={styles.back}>
           <Ionicons name="arrow-back" size={22} color={colors.text} />
         </Pressable>
         <View style={styles.headerCopy}>

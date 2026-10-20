@@ -44,6 +44,13 @@ export function ThemeProvider({ children }: PropsWithChildren) {
   const [theme, setTheme] = useState<ThemeName>('light');
 
   useEffect(() => {
+    if (typeof document === 'undefined') return;
+    document.documentElement.style.colorScheme = theme;
+    document.documentElement.style.setProperty('--app-input-text', palettes[theme].text);
+    document.documentElement.style.setProperty('--app-input-background', palettes[theme].surfaceAlt);
+  }, [theme]);
+
+  useEffect(() => {
     let active = true;
     AsyncStorage.getItem(THEME_KEY).then((saved) => {
       if (active && (saved === 'light' || saved === 'dark')) setTheme(saved);

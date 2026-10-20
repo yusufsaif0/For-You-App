@@ -1,4 +1,6 @@
 :root {
+  --app-input-text: #172033;
+  --app-input-background: #eef1f8;
   --font-display:
     Spline Sans, Inter, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji,
     Segoe UI Symbol, Noto Color Emoji;
@@ -6,4 +8,13 @@
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
   --font-rounded: 'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif;
   --font-serif: Georgia, 'Times New Roman', serif;
+}
+
+/* Keep browser-filled credentials readable in the app's selected theme. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--app-input-text);
+  -webkit-box-shadow: 0 0 0 1000px var(--app-input-background) inset;
+  caret-color: var(--app-input-text);
 }

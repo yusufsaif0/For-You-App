@@ -35,6 +35,8 @@
     "expo-system-ui": "~57.0.4",
     "expo-web-browser": "~57.0.3",
     "firebase": "^12.7.0",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^6.4.299",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-native": "0.86.3",
@@ -60,10 +62,11 @@
     "uuid": "^11.1.1"
   },
   "scripts": {
-    "postinstall": "patch-package --error-on-fail",
+    "postinstall": "patch-package --error-on-fail && node scripts/prepare-document-tools.cjs",
     "release:check": "node --env-file-if-exists=.env scripts/check-release-config.cjs",
     "eas-build-post-install": "node scripts/check-release-config.cjs --eas",
     "test": "node --experimental-strip-types --test src/utils/*.test.js src/state/*.test.js",
+    "test:pdf-runtime": "node scripts/check-pdf-runtime.cjs",
     "typecheck": "tsc --noEmit",
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",

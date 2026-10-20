@@ -26,6 +26,7 @@ class MainApplication : Application(), ReactApplication {
           add(AppUsagePackage())
           add(StepCounterPackage())
           add(MessageCapturePackage())
+          add(DocumentToolsPackage())
         }
     )
   }

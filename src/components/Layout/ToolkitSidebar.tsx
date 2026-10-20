@@ -19,6 +19,7 @@ const toolkit = [
   { title: 'Screen time', icon: 'time', color: '#4086E3', route: '/screen-time' },
   { title: 'Weather', icon: 'partly-sunny', color: '#E29A2D', route: '/weather' },
   { title: 'Private vault', icon: 'shield-checkmark', color: '#8260D8', route: '/vault' },
+  { title: 'Document tools', icon: 'construct', color: '#159CA9', route: '/document-tools' },
   { title: 'Family', icon: 'people', color: '#D45A8C', route: '/family' },
 ] as const;
 
@@ -64,7 +65,8 @@ function SidebarContent({ onClose, drawer = false }: { onClose: () => void; draw
     <View style={[styles.search, { backgroundColor: colors.input }]}>
       <Ionicons name="search" size={19} color={colors.muted} />
       <TextInput accessibilityLabel="Search toolkit" placeholder="Search menu" placeholderTextColor={colors.muted}
-        value={query} onChangeText={setQuery} autoCorrect={false} returnKeyType="search"
+        nativeID="toolkit-menu-search" inputMode="search" autoComplete="off" importantForAutofill="no" textContentType="none"
+        value={query} onChangeText={setQuery} autoCorrect={false} autoCapitalize="none" spellCheck={false} returnKeyType="search"
         style={[styles.searchInput, { color: colors.text }]} />
       {query ? <Pressable accessibilityRole="button" accessibilityLabel="Clear menu search" onPress={() => setQuery('')} style={styles.clearSearch}>
         <Ionicons name="close-circle" size={18} color={colors.muted} />
@@ -153,9 +155,9 @@ export default function ToolkitLayout({ children }: PropsWithChildren) {
 }
 
 const styles = StyleSheet.create({
-  layout: { flex: 1, flexDirection: 'row' },
-  content: { flex: 1, minWidth: 0 },
-  desktopSidebar: { width: 286, borderRightWidth: 1 },
+  layout: { flex: 1, flexDirection: 'row', minWidth: 0, width: '100%' },
+  content: { flex: 1, minWidth: 0, minHeight: 0, overflow: 'hidden' },
+  desktopSidebar: { width: 286, flexShrink: 0, borderRightWidth: 1 },
   sidebar: { flex: 1 },
   menuHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 18, paddingBottom: 16 },
   menuTitle: { fontSize: 28, fontWeight: '700', letterSpacing: -0.7 },

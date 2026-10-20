@@ -1,10 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '@/state/AuthProvider';
 import { useAppTheme } from '@/state/ThemeProvider';
+import { goBackOrHome } from '@/services/navigation';
 
 export default function AccountScreen() {
   const { colors } = useAppTheme();
@@ -27,7 +27,7 @@ export default function AccountScreen() {
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
-        <Pressable accessibilityRole="button" accessibilityLabel="Go back" onPress={() => router.back()} style={[styles.back, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Go back" onPress={goBackOrHome} style={[styles.back, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <Ionicons name="arrow-back" size={21} color={colors.text} />
         </Pressable>
         <Text style={[styles.title, { color: colors.text }]}>Account</Text>

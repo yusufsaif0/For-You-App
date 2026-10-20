@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { router, useFocusEffect } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,6 +7,7 @@ import {
   getAppUsage, hasUsageAccess, isUsageTrackingAvailable, openUsageAccessSettings, type AppUsageEntry,
 } from '@/services/app-usage';
 import { useAppTheme } from '@/state/ThemeProvider';
+import { goBackOrHome } from '@/services/navigation';
 
 type Period = 'Today' | 'This week' | 'This month';
 
@@ -71,7 +72,7 @@ export default function ScreenTimeScreen() {
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
-        <Pressable accessibilityRole="button" accessibilityLabel="Go back" onPress={() => router.back()} style={styles.back}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Go back" onPress={goBackOrHome} style={styles.back}>
           <Ionicons name="arrow-back" size={22} color={colors.text} />
         </Pressable>
         <View style={styles.headerCopy}>

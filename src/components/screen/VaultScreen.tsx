@@ -18,6 +18,10 @@ import { isVaultInitialized, saveVaultRecords, unlockNativeVault, unlockWebVault
 import { useAppTheme } from '@/state/ThemeProvider';
 import { useAuth } from '@/state/AuthProvider';
 import { base64ToBytes, bytesToBase64, documentBytesMatchMimeType } from '@/utils/documentCrypto';
+import DocumentToolsPanel from './DocumentToolsPanel';
+import { checkProcessing, type ProcessedDocument } from '@/utils/documentTools';
+import { saveDocumentBatch } from '@/utils/vaultDocumentBatch';
+import { goBackOrHome } from '@/services/navigation';
 
 type Draft = Record<string, string>;
 
@@ -80,7 +84,7 @@ function suggestedCategory(filename: string): string {
 }
 
 function VaultInput({
-  label, value, onChangeText, colors, secure = false, keyboard = 'default', autoCapitalize = 'none', placeholder,
+  label, value, onChangeText, colors, secure = false, keyboard = 'default', autoCapitalize = 'none', placeholder, newPassword = false,
 }: {
   label: string;
   value: string;
@@ -90,6 +94,7 @@ function VaultInput({
   keyboard?: 'default' | 'url';
   autoCapitalize?: 'none' | 'sentences' | 'words';
   placeholder?: string;
+  newPassword?: boolean;
 }) {
   const [secretVisible, setSecretVisible] = useState(false);
   return (
@@ -103,6 +108,8 @@ function VaultInput({
           secureTextEntry={secure && !secretVisible}
           autoCapitalize={autoCapitalize}
           autoCorrect={false}
+          autoComplete={newPassword ? 'new-password' : 'off'}
+          importantForAutofill="no"
           keyboardType={keyboard === 'url' ? 'url' : 'default'}
           placeholder={placeholder ?? label}
           placeholderTextColor={colors.muted}
@@ -124,7 +131,7 @@ function VaultInput({
   );
 }
 
-export default function VaultScreen() {
+export default function VaultScreen({ openToolsOnUnlock = false }: { openToolsOnUnlock?: boolean }) {
   const { colors } = useAppTheme();
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
@@ -157,6 +164,11 @@ export default function VaultScreen() {
   const [copyMessage, setCopyMessage] = useState('');
   const vaultSession = useRef(0);
   const documentPickerActive = useRef(false);
+  const [toolsVisible, setToolsVisible] = useState(false);
+  const [toolDocumentId, setToolDocumentId] = useState('');
+  const [toolSession, setToolSession] = useState(0);
+  const recordsRef = useRef(records);
+  useEffect(() => { recordsRef.current = records; }, [records]);
 
   useEffect(() => {
     let active = true;
@@ -187,6 +199,8 @@ export default function VaultScreen() {
     setOcrTarget(null);
     setCopyMessage('');
     setError('');
+    setToolsVisible(false);
+    setToolDocumentId('');
   }, []);
 
   useFocusEffect(useCallback(() => () => lockVault(), [lockVault]));
@@ -275,6 +289,7 @@ export default function VaultScreen() {
       setInitialized(true);
       setUnlocked(true);
       vaultSession.current += 1;
+      if (openToolsOnUnlock) { setToolSession(vaultSession.current); setToolsVisible(true); }
       setPassword('');
       setPasswordConfirm('');
     } catch (failure) {
@@ -288,6 +303,35 @@ export default function VaultScreen() {
     if (!vaultKey) throw new Error('The vault is locked. Unlock it before changing records.');
     await saveVaultRecords(next, vaultKey);
     setRecords(next);
+  };
+
+  const saveToolFiles = async (files: ProcessedDocument[], category: string, signal: AbortSignal): Promise<VaultRecord[]> => {
+    const assertSession = () => {
+      checkProcessing(signal);
+      if (!vaultKey || toolSession !== vaultSession.current) throw new Error('The vault locked before the files could be saved. Unlock it and try again.');
+    };
+    assertSession();
+    setBusy(true);
+    try {
+      for (const file of files) {
+        if (!documentBytesMatchMimeType(file.bytes, file.mimeType)) throw new Error('The processed file is invalid and was not saved.');
+      }
+      return await saveDocumentBatch(files, category, {
+        assertActive: assertSession,
+        saveFile: (bytes) => saveEncryptedDocument(bytes, vaultKey),
+        deleteFile: deleteEncryptedDocument,
+        readRecords: () => recordsRef.current,
+        commitRecords: async (next) => {
+          await saveVaultRecords(next, vaultKey);
+          if (toolSession === vaultSession.current) {
+            recordsRef.current = next;
+            setRecords(next);
+          }
+        },
+      });
+    } finally {
+      setBusy(false);
+    }
   };
 
   const openForm = (type: VaultRecordType, record?: VaultRecord) => {
@@ -634,35 +678,40 @@ export default function VaultScreen() {
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
-        <Pressable accessibilityRole="button" accessibilityLabel="Go back" onPress={() => router.back()} style={[styles.iconButton, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Go back" onPress={goBackOrHome} style={[styles.iconButton, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <Ionicons name="arrow-back" size={21} color={colors.text} />
         </Pressable>
         <View style={styles.headerCopy}>
-          <Text style={[styles.title, { color: colors.text }]}>Private vault</Text>
+          <Text style={[styles.title, { color: colors.text }]}>{openToolsOnUnlock && !unlocked ? 'Document tools' : 'Private vault'}</Text>
           <Text style={[styles.subtitle, { color: colors.muted }]}>Encrypted on this device</Text>
         </View>
         {unlocked ? (
           <Pressable accessibilityRole="button" accessibilityLabel="Lock vault" onPress={lockVault} style={[styles.iconButton, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <Ionicons name="lock-closed-outline" size={20} color={colors.primary} />
           </Pressable>
-        ) : <View style={styles.iconButton} />}
+        ) : <View style={styles.headerSpacer} />}
       </View>
 
       {!unlocked ? (
+        <ScrollView style={styles.lockScroll} contentContainerStyle={[styles.lockContent, { paddingBottom: Math.max(insets.bottom, 20) }]}
+          keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <View style={[styles.lockPanel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <View style={[styles.lockIcon, { backgroundColor: colors.primarySoft }]}>
             <Ionicons name="shield-checkmark-outline" size={32} color={colors.primary} />
           </View>
           <Text style={[styles.lockTitle, { color: colors.text }]}>{initialized ? 'Unlock your vault' : 'Create your private vault'}</Text>
+          {openToolsOnUnlock ? <Text style={[styles.lockCaption, { color: colors.muted }]}>Unlock to compress, resize or convert files. New uploads and results will be auto-saved here.</Text> : null}
           <Text style={[styles.lockCaption, { color: colors.muted }]}>
             {Platform.OS === 'web'
-              ? 'Choose a unique password with 12+ characters. It encrypts this vault and is never saved.'
+              ? initialized
+                ? 'Enter the vault password you created in this browser. It is separate from your account password.'
+                : 'Choose a unique password with 12+ characters. It encrypts this vault and is never saved.'
               : 'Your vault is encrypted on this device. Unlocking uses your device biometrics; it is not synced or backed up.'}
           </Text>
           {Platform.OS === 'web' ? (
             <>
-              <VaultInput label="Password" placeholder="Enter vault password" value={password} onChangeText={setPassword} colors={colors} secure autoCapitalize="none" />
-              {!initialized ? <VaultInput label="Confirm password" placeholder="Re-enter vault password" value={passwordConfirm} onChangeText={setPasswordConfirm} colors={colors} secure autoCapitalize="none" /> : null}
+              <VaultInput label="Vault password" placeholder="Enter vault password" value={password} onChangeText={setPassword} colors={colors} secure autoCapitalize="none" newPassword={!initialized} />
+              {!initialized ? <VaultInput label="Confirm vault password" placeholder="Re-enter vault password" value={passwordConfirm} onChangeText={setPasswordConfirm} colors={colors} secure autoCapitalize="none" newPassword /> : null}
             </>
           ) : null}
           {error ? <Text accessibilityRole="alert" style={[styles.error, { color: colors.red }]}>{error}</Text> : null}
@@ -676,6 +725,7 @@ export default function VaultScreen() {
             </Text>
           </View>
         </View>
+        </ScrollView>
       ) : (
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           <View style={[styles.safetyBanner, { backgroundColor: colors.primarySoft }]}>
@@ -688,6 +738,11 @@ export default function VaultScreen() {
               <Text style={[styles.sectionCaption, { color: colors.muted }]}>{records.length} {records.length === 1 ? 'item' : 'items'} · stays on this device</Text>
             </View>
             <View style={styles.addActions}>
+              <Pressable accessibilityRole="button" disabled={busy || ocrBusy} onPress={() => { setToolSession(vaultSession.current); setToolDocumentId(''); setToolsVisible(true); }}
+                style={[styles.addButton, { backgroundColor: colors.primarySoft }]}>
+                <Ionicons name="construct-outline" size={18} color={colors.primary} />
+                <Text style={[styles.addText, { color: colors.primary }]}>Document tools</Text>
+              </Pressable>
               <Pressable accessibilityRole="button" disabled={busy} onPress={() => void pickDocument()}
                 style={[styles.addButton, { backgroundColor: colors.primary }, busy && styles.disabledButton]}>
                 <Ionicons name="cloud-upload-outline" size={18} color="#FFFFFF" />
@@ -777,6 +832,11 @@ export default function VaultScreen() {
                     {record.extractedDocumentType ? ` · detected as ${record.extractedDocumentType}` : ''}
                   </Text>
                   <View style={styles.documentActions}>
+                    <Pressable accessibilityRole="button" disabled={busy || ocrBusy} onPress={() => { setToolSession(vaultSession.current); setToolDocumentId(record.id); setToolsVisible(true); }}
+                      style={[styles.documentAction, { backgroundColor: colors.primarySoft }]}>
+                      <Ionicons name="contract-outline" size={16} color={colors.primary} />
+                      <Text style={[styles.documentActionText, { color: colors.primary }]}>Compress / convert</Text>
+                    </Pressable>
                     <Pressable accessibilityRole="button" disabled={busy} onPress={() => void openDocument(record)}
                       style={[styles.documentAction, { backgroundColor: colors.surfaceAlt }]}>
                       <Ionicons name="open-outline" size={16} color={colors.primary} />
@@ -827,6 +887,14 @@ export default function VaultScreen() {
           {busy ? <ActivityIndicator style={styles.savingIndicator} color={colors.primary} /> : null}
         </ScrollView>
       )}
+
+      <Modal visible={toolsVisible && unlocked} animationType="slide" onRequestClose={() => setToolsVisible(false)}>
+        {toolsVisible && unlocked ? <DocumentToolsPanel
+          records={records} vaultKey={vaultKey} initialDocumentId={toolDocumentId}
+          onClose={() => setToolsVisible(false)} onPickerActive={(active) => { documentPickerActive.current = active; }}
+          onSave={saveToolFiles}
+        /> : null}
+      </Modal>
 
       <Modal visible={filterModalVisible} transparent animationType="slide" onRequestClose={() => setFilterModalVisible(false)}>
         <View style={styles.modalBackdrop}>
@@ -989,26 +1057,29 @@ export default function VaultScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1 },
+  safe: { flex: 1, minWidth: 0, width: '100%' },
   header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 20, paddingVertical: 10 },
-  headerCopy: { flex: 1 },
+  headerCopy: { flex: 1, minWidth: 0 },
   title: { fontSize: 21, fontWeight: '800', letterSpacing: -0.4 },
   subtitle: { fontSize: 12, marginTop: 2 },
   iconButton: { width: 42, height: 42, borderRadius: 14, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  lockPanel: { margin: 20, borderRadius: 24, borderWidth: 1, padding: 22, alignItems: 'stretch' },
+  headerSpacer: { width: 42, height: 42 },
+  lockScroll: { flex: 1, width: '100%', minWidth: 0 },
+  lockContent: { flexGrow: 1, padding: 20, alignItems: 'center' },
+  lockPanel: { width: '100%', maxWidth: 520, minWidth: 0, borderRadius: 24, borderWidth: 1, padding: 22, alignItems: 'stretch' },
   lockIcon: { width: 62, height: 62, borderRadius: 21, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginBottom: 14 },
   lockTitle: { fontSize: 21, fontWeight: '800', textAlign: 'center' },
   lockCaption: { fontSize: 13, lineHeight: 19, textAlign: 'center', marginTop: 8, marginBottom: 18 },
-  field: { marginBottom: 12 },
+  field: { marginBottom: 12, minWidth: 0 },
   fieldLabel: { fontSize: 12, fontWeight: '700', marginBottom: 6 },
   inputContainer: { minHeight: 46, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderRadius: 12, paddingLeft: 12, paddingRight: 4 },
   input: { borderWidth: 1, borderRadius: 12, minHeight: 46, paddingHorizontal: 12, fontSize: 14 },
-  inputInContainer: { flex: 1, minWidth: 0, borderWidth: 0, borderRadius: 0, paddingHorizontal: 0 },
+  inputInContainer: { flex: 1, minWidth: 0, borderWidth: 0, borderRadius: 0, paddingHorizontal: 0, backgroundColor: 'transparent' },
   passwordVisibilityButton: { width: 42, height: 42, alignItems: 'center', justifyContent: 'center' },
   primaryButton: { minHeight: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginTop: 8, paddingHorizontal: 14 },
   primaryText: { color: '#FFFFFF', fontSize: 14, fontWeight: '800', textAlign: 'center' },
   warningCard: { flexDirection: 'row', gap: 9, padding: 12, borderRadius: 13, marginTop: 16 },
-  warningText: { flex: 1, fontSize: 11, lineHeight: 16 },
+  warningText: { flex: 1, minWidth: 0, fontSize: 11, lineHeight: 16 },
   error: { fontSize: 12, lineHeight: 18, marginBottom: 8 },
   content: { width: '100%', maxWidth: 900, alignSelf: 'center', paddingHorizontal: 20, paddingBottom: 36 },
   safetyBanner: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 11, borderRadius: 13, marginTop: 8 },

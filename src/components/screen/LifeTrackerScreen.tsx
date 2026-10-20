@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker';
-import { useFocusEffect, router } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator, Alert, KeyboardAvoidingView, Modal, Platform, Pressable,
@@ -12,6 +12,7 @@ import { syncReminderNotifications } from '@/services/notifications/reminders';
 import { useAppTheme } from '@/state/ThemeProvider';
 import type { LifeItem, LifeItemInput, LifeItemKind, MealType, TaskPriority } from '@/types/life-item';
 import { mergeDatePart, mergeTimePart } from '@/utils/scheduleDates';
+import { goBackOrHome } from '@/services/navigation';
 
 const featureConfig = {
   meal: { title: 'Meals & calories', subtitle: 'A mindful look at what fuels you', icon: 'nutrition-outline', accent: '#F08A55', add: 'Log a meal' },
@@ -237,7 +238,7 @@ export default function LifeTrackerScreen({ kind }: Props) {
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
-        <Pressable accessibilityRole="button" accessibilityLabel="Go back" onPress={() => router.back()} style={styles.back}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Go back" onPress={goBackOrHome} style={styles.back}>
           <Ionicons name="arrow-back" size={22} color={colors.text} />
         </Pressable>
         <View style={styles.headerCopy}>
